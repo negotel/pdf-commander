@@ -10,7 +10,7 @@ const HeaderMenu = ({ isDarkMode, toggleTheme, onCheckUpdates }) => {
     const handleCheckUpdates = async () => {
         setIsCheckingUpdates(true);
         try {
-            await onCheckUpdates();
+            await onCheckUpdates(true); // Forçar verificação
         } finally {
             setIsCheckingUpdates(false);
         }

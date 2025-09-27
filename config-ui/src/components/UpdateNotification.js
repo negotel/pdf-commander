@@ -38,21 +38,29 @@ const UpdateNotification = ({ isDarkMode, show, onClose }) => {
             setDownloadProgress(progress);
         };
 
+        // Escutar evento de força verificação
+        const handleForceCheck = () => {
+            console.log('🔄 Forçando verificação de updates...');
+            checkForUpdates(true);
+        };
+
         ipcRenderer.on('update-download-progress', handleDownloadProgress);
+        window.addEventListener('force-update-check', handleForceCheck);
 
         return () => {
             ipcRenderer.removeListener('update-download-progress', handleDownloadProgress);
+            window.removeEventListener('force-update-check', handleForceCheck);
         };
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const checkForUpdates = async () => {
+    const checkForUpdates = async (force = false) => {
         if (!isElectron()) return;
 
         const ipcRenderer = getIpcRenderer();
         if (!ipcRenderer) return;
 
         try {
-            const result = await ipcRenderer.invoke('check-for-updates');
+            const result = await ipcRenderer.invoke('check-for-updates', force);
 
             if (result.success && result.updateData) {
                 setUpdateData(result.updateData);

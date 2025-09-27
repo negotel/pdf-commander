@@ -114,8 +114,16 @@ function App() {
         console.log('🔒 Modo administrador desativado');
     };
 
-    const onCheckUpdates = () => {
+    const onCheckUpdates = (force = false) => {
         setShowUpdateNotification(true);
+        // Se for forçado, podemos passar essa informação para o UpdateNotification
+        if (force) {
+            // Armazenar em um estado para passar para UpdateNotification
+            setTimeout(() => {
+                // Disparar evento para forçar verificação
+                window.dispatchEvent(new CustomEvent('force-update-check'));
+            }, 100);
+        }
     };
 
     // Salvar configurações de etiquetas

@@ -335,9 +335,9 @@ ipcMain.handle('get-monitoring-stats', async () => {
 });
 
 // Handler para verificar atualizações
-ipcMain.handle('check-for-updates', async () => {
+ipcMain.handle('check-for-updates', async (event, force = false) => {
     try {
-        const updateData = await updateService.checkForUpdates();
+        const updateData = await updateService.checkForUpdates(force);
         return { success: true, updateData };
     } catch (error) {
         console.error('Erro ao verificar atualizações:', error);

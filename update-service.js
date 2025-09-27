@@ -82,7 +82,7 @@ class UpdateService {
     /**
      * Verifica se há atualizações disponíveis
      */
-    async checkForUpdates() {
+    async checkForUpdates(force = false) {
         if (this.isChecking) {
             console.log('🔄 Verificação de atualização já em andamento...');
             return null;
@@ -91,10 +91,10 @@ class UpdateService {
         this.isChecking = true;
 
         try {
-            console.log('🔄 Verificando atualizações...');
+            console.log('🔄 Verificando atualizações...', force ? '(forçado)' : '');
 
-            // Verificar se devemos fazer uma nova verificação
-            if (!this.shouldCheckForUpdates()) {
+            // Verificar se devemos fazer uma nova verificação (só se não for forçado)
+            if (!force && !this.shouldCheckForUpdates()) {
                 console.log('🔄 Última verificação recente, pulando...');
                 this.isChecking = false;
                 return null;
