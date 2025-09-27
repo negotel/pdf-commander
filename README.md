@@ -1,7 +1,13 @@
 # ⚡ PDF Commander
 
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/SEU_USERNAME/pdf-commander/releases)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https:## 📚 Documentação
+
+- **[Sistema de Releases](RELEASES.md)** - Como criar releases automaticamente
+- **[Guia de Contribuição](CONTRIBUTING.md)** - Como contribuir com o projeto
+- **[Changelog](CHANGELOG.md)** - Histórico de versões e mudanças
+- **[Sistema de Atualização](UPDATE_SYSTEM_README.md)** - Documentação técnica do sistema de updates
+- **[Licença MIT](LICENSE)** - Termos de uso e distribuiçãosource.org/licenses/MIT)
 [![Electron](https://img.shields.io/badge/Electron-33.0.2-47848F)](https://electronjs.org/)
 [![React](https://img.shields.io/badge/React-18.2.0-61DAFB)](https://reactjs.org/)
 
