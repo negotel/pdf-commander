@@ -36,7 +36,7 @@ function createWindow() {
             contextIsolation: false,
             enableRemoteModule: true
         },
-        title: 'Processador de PDFs',
+        title: 'PDF Commander',
         show: true,
         center: true,
         resizable: true,

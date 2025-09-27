@@ -1,6 +1,6 @@
-# 📄 Processador de PDFs
+# 📄 PDF Commander
 
-Sistema completo para unir, normalizar e organizar arquivos PDF com interface React moderna.
+Sistema completo para processar, unir, normalizar e organizar arquivos PDF com interface React moderna.
 
 ## ✨ Funcionalidades
 

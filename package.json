@@ -1,7 +1,7 @@
 {
-    "name": "unir-pdfs",
+    "name": "pdf-commander",
     "version": "1.0.0",
-    "description": "Processador de PDFs com interface nativa integrada",
+    "description": "PDF Commander - Processador completo de PDFs com interface nativa integrada",
     "main": "main.js",
     "type": "commonjs",
     "scripts": {
