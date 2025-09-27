@@ -30,7 +30,7 @@ jobs:
     - name: 📦 Instalar dependências (Config-UI)
       run: |
         cd config-ui
-        npm ci
+        npm install
         cd ..
 
     - name: 🏗️ Build da interface React
