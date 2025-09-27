@@ -131,7 +131,6 @@ const GerarTab = ({ produtos, config, isDarkMode }) => {
             const layout = calculateLayout();
 
             let etiquetasColocadas = 0;
-            let paginaAtual = 0; // eslint-disable-line no-unused-vars
 
             for (let i = 0; i < quantityToUse; i++) {
                 const posicaoNaGrade = etiquetasColocadas % layout.etiquetasPorPagina;
@@ -140,7 +139,6 @@ const GerarTab = ({ produtos, config, isDarkMode }) => {
 
                 if (posicaoNaGrade === 0 && etiquetasColocadas > 0) {
                     pdf.addPage();
-                    paginaAtual++;
                 }
 
                 const x = layout.margemXFinal + (coluna * (config.larguraEtiqueta + layout.espacoHorizontal));
