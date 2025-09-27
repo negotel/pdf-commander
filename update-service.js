@@ -10,9 +10,9 @@ class UpdateService {
     constructor() {
         this.config = {
             repoOwner: 'negotel', // Substitua pelo seu usuário do GitHub
-            repoName: 'unir-pdfs', // Substitua pelo nome do repositório
+            repoName: 'pdf-commander', // Substitua pelo nome do repositório
             currentVersion: this.getCurrentVersion(),
-            checkInterval: 24 * 60 * 60 * 1000, // 24 horas
+            checkInterval: 5 * 60 * 60 * 1000, // 5 horas
             githubApiUrl: 'https://api.github.com'
         };
 

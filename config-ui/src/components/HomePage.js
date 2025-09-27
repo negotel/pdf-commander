@@ -1,6 +1,55 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { APP_CONFIG } from '../config';
+import { RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 
 const HomePage = ({ onNavigate, isDarkMode }) => {
+    const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
+    const [updateStatus, setUpdateStatus] = useState(null); // null, 'checking', 'available', 'up-to-date', 'error'
+
+    // Verificar se está rodando no Electron
+    const isElectron = () => {
+        return typeof window !== 'undefined' && window.require;
+    };
+
+    const getIpcRenderer = () => {
+        if (!isElectron()) return null;
+        try {
+            return window.require('electron').ipcRenderer;
+        } catch (error) {
+            return null;
+        }
+    };
+
+    const handleCheckForUpdates = async () => {
+        if (!isElectron()) {
+            setUpdateStatus('error');
+            return;
+        }
+
+        const ipcRenderer = getIpcRenderer();
+        if (!ipcRenderer) {
+            setUpdateStatus('error');
+            return;
+        }
+
+        setIsCheckingUpdate(true);
+        setUpdateStatus('checking');
+
+        try {
+            const result = await ipcRenderer.invoke('check-for-updates');
+
+            if (result.success && result.updateData) {
+                setUpdateStatus('available');
+            } else {
+                setUpdateStatus('up-to-date');
+            }
+        } catch (err) {
+            console.error('Erro ao verificar atualizações:', err);
+            setUpdateStatus('error');
+        } finally {
+            setIsCheckingUpdate(false);
+        }
+    };
     const processes = [
         {
             id: 'unir',
@@ -104,10 +153,55 @@ const HomePage = ({ onNavigate, isDarkMode }) => {
                         <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                             Todos os serviços estão funcionando normalmente
                         </p>
+                        {updateStatus && (
+                            <div className="flex items-center mt-2 text-sm">
+                                {updateStatus === 'checking' && (
+                                    <>
+                                        <RefreshCw className="w-4 h-4 mr-2 animate-spin text-blue-500" />
+                                        <span className="text-blue-600">Verificando atualizações...</span>
+                                    </>
+                                )}
+                                {updateStatus === 'available' && (
+                                    <>
+                                        <AlertCircle className="w-4 h-4 mr-2 text-orange-500" />
+                                        <span className="text-orange-600">Nova versão disponível!</span>
+                                    </>
+                                )}
+                                {updateStatus === 'up-to-date' && (
+                                    <>
+                                        <CheckCircle className="w-4 h-4 mr-2 text-green-500" />
+                                        <span className="text-green-600">Sistema atualizado</span>
+                                    </>
+                                )}
+                                {updateStatus === 'error' && (
+                                    <>
+                                        <AlertCircle className="w-4 h-4 mr-2 text-red-500" />
+                                        <span className="text-red-600">Erro na verificação</span>
+                                    </>
+                                )}
+                            </div>
+                        )}
                     </div>
-                    <div className="flex items-center space-x-2">
-                        <span className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
-                        <span className="text-green-600 font-medium">Online</span>
+                    <div className="flex items-center space-x-3">
+                        <button
+                            onClick={handleCheckForUpdates}
+                            disabled={isCheckingUpdate}
+                            className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                                isCheckingUpdate
+                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    : isDarkMode
+                                        ? 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                            }`}
+                            title="Verificar se há atualizações disponíveis"
+                        >
+                            <RefreshCw className={`w-4 h-4 mr-2 ${isCheckingUpdate ? 'animate-spin' : ''}`} />
+                            {isCheckingUpdate ? 'Verificando...' : 'Verificar Updates'}
+                        </button>
+                        <div className="flex items-center space-x-2">
+                            <span className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                            <span className="text-green-600 font-medium">Online</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -116,7 +210,7 @@ const HomePage = ({ onNavigate, isDarkMode }) => {
             <div className={`text-center text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 <p>
                     Desenvolvido para <strong>PRIMESLOGS</strong> •
-                    Versão 2.0 •
+                    Versão {APP_CONFIG.version} •
                     {new Date().getFullYear()}
                 </p>
             </div>

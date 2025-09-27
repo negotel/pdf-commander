@@ -1,13 +1,68 @@
 # ⚡ PDF Commander
 
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/SEU_USERNAME/pdf-commander/releases)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https:## 📚 Documentação
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https:## � Criando Releases
 
-- **[Sistema de Releases](RELEASES.md)** - Como criar releases automaticamente
-- **[Guia de Contribuição](CONTRIBUTING.md)** - Como contribuir com o projeto
-- **[Changelog](CHANGELOG.md)** - Histórico de versões e mudanças
-- **[Sistema de Atualização](UPDATE_SYSTEM_README.md)** - Documentação técnica do sistema de updates
-- **[Licença MIT](LICENSE)** - Termos de uso e distribuiçãosource.org/licenses/MIT)
+O projeto inclui scripts automatizados para criação de releases via GitHub API:
+
+### Scripts Disponíveis
+
+- **`./release.sh`** - **PROCESSO COMPLETO AUTOMATIZADO** (recomendado)
+  - Incrementa versão automaticamente
+  - Atualiza interface com nova versão
+  - Reconstrói interface React
+  - Cria release no GitHub
+  - Faz upload de todos os assets
+- **`./create-release.sh <tag> <token>`** - Cria release personalizado
+
+### Como Usar - Processo Automatizado
+
+```bash
+# Release completo automatizado (recomendado)
+./release.sh
+
+# Isso faz automaticamente:
+# 1. 📈 Incrementa versão (patch: 1.0.8 → 1.0.9)
+# 2. 🔄 Atualiza interface com nova versão
+# 3. 🏗️ Reconstrói interface React
+# 4. 📦 Cria release no GitHub
+# 5. 📎 Faz upload do instalador, blockmap e latest.yml
+# 6. 🎉 Pronto! Usuários verão modal de atualização
+```
+
+### Processo Manual (se necessário)
+   ```bash
+   ./release.sh
+   ```
+
+2. **Release Personalizado**:
+   ```bash
+   TOKEN=$(cat token | cut -d' ' -f2)
+   ./create-release.sh v1.0.6 "$TOKEN"
+   ```
+
+### Pré-requisitos
+
+- Token do GitHub com permissões `repo` em `token`
+- Arquivos de build em `dist-release/`
+- Tag Git correspondente à versão
+
+### Processo Automático
+
+1. ✅ Cria tag e release no GitHub
+2. 📎 Faz upload do instalador (.exe)
+3. 📎 Faz upload do blockmap (.exe.blockmap)
+4. 📎 Faz upload do arquivo latest.yml
+5. 🎉 Release pronto para distribuição
+
+### Estrutura de Release
+
+```
+📦 PDF Commander v1.0.6
+├── 📥 PDF Commander Setup v1.0.6.exe (Instalador)
+├── 📄 PDF Commander Setup v1.0.6.exe.blockmap (Blockmap)
+└── 📋 latest.yml (Configuração de atualização)
+```
 [![Electron](https://img.shields.io/badge/Electron-33.0.2-47848F)](https://electronjs.org/)
 [![React](https://img.shields.io/badge/React-18.2.0-61DAFB)](https://reactjs.org/)
 
@@ -33,9 +88,11 @@
 - **Relatórios de Performance**: Análise de produtividade e eficiência
 
 ### 🔄 Atualização Automática
-- **Verificação Automática**: Busca por novas versões no GitHub
+- **Verificação Automática**: A cada 5 horas o sistema verifica automaticamente por novas versões
+- **Botão Manual**: Na tela inicial há um botão "Verificar Updates" para checagem imediata
+- **Notificações**: Modal aparece automaticamente quando há atualização disponível
 - **Download One-Click**: Instalação automática de atualizações
-- **Notificações Inteligentes**: Alertas não-intrusivos sobre novas versões
+- **Backup**: Arquivos originais são preservados automaticamente
 
 ### 💾 Gestão de Arquivos
 - **Backup Automático**: Preservação de arquivos originais

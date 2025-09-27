@@ -1,10 +1,27 @@
 # 🚀 Sistema de Releases Automáticos
 
-O PDF Commander possui um sistema automatizado de criação de releases usando GitHub Actions.
+O PDF Commander possui um sistema automatizado de criação de releases usando GitHub API diretamente.
 
 ## 📋 Como Criar um Novo Release
 
-### Método 1: Via Git (Recomendado)
+### Método 1: Processo Completamente Automatizado (Recomendado)
+
+```bash
+# Um comando faz tudo automaticamente!
+./release.sh
+
+# Processo automático:
+# 1. 📈 Incrementa versão (ex: 1.0.8 → 1.0.9)
+# 2. 🔄 Atualiza interface React com nova versão
+# 3. 🏗️ Reconstrói interface automaticamente
+# 4. 📦 Cria release no GitHub
+# 5. 📎 Faz upload de todos os assets (exe, blockmap, latest.yml)
+# 6. 🎉 Usuários recebem notificação de atualização!
+```
+
+### Método 2: Via Scripts Individuais
+
+### Método 2: Via Git (GitHub Actions)
 
 ```bash
 # 1. Atualizar versão no package.json
@@ -22,15 +39,55 @@ git push origin main
 git push origin v1.0.1
 ```
 
-### Método 2: Via Interface do GitHub
+### Método 3: Via Interface do GitHub
 
 1. Vá para [Releases](https://github.com/negotel/pdf-commander/releases)
 2. Clique em "Create a new release"
-3. Digite a tag (ex: `v1.0.1`)
+3. Digite a tag (ex: `v1.0.6`)
 4. Preencha título e descrição
 5. Clique em "Publish release"
 
-## ⚙️ O que o Workflow Faz Automaticamente
+## 🔄 Sistema de Atualização Automática
+
+O PDF Commander inclui um sistema completo de atualização automática:
+
+### ⚙️ Funcionalidades
+
+- **🔄 Verificação Automática**: A cada 5 horas o sistema verifica automaticamente por novas versões
+- **🔍 Verificação Manual**: Botão "Verificar Updates" na tela inicial para checagem imediata
+- **📢 Notificações**: Modal aparece automaticamente quando há atualização disponível
+- **⬇️ Download Automático**: Instalação one-click de atualizações
+- **💾 Backup**: Arquivos originais são preservados automaticamente
+- **🔄 Reinício Automático**: Aplicação reinicia automaticamente após instalação
+
+### 🎯 Como Funciona
+
+1. **Verificação**: Sistema busca por releases mais recentes no GitHub
+2. **Comparação**: Compara versão atual com versão disponível
+3. **Notificação**: Mostra modal se houver atualização
+4. **Download**: Baixa instalador automaticamente
+5. **Instalação**: Executa instalador e reinicia aplicação
+
+### 📊 Status da Verificação
+
+O sistema mostra diferentes status na interface:
+- **🟢 Online**: Sistema funcionando normalmente
+- **🔄 Verificando...**: Checagem em andamento
+- **🟠 Nova versão disponível!**: Atualização encontrada
+- **🟢 Sistema atualizado**: Nenhuma atualização necessária
+- **🔴 Erro na verificação**: Problema na conexão
+
+### Via Scripts API (Novo Sistema)
+
+1. **🔐 Autenticação** - Lê token do arquivo `token`
+2. **📝 Criar Release** - Cria release via GitHub API
+3. **📎 Upload Assets** - Anexa arquivos automaticamente:
+   - `PDF Commander Setup X.X.X.exe` - Instalador
+   - `PDF Commander Setup X.X.X.exe.blockmap` - Para atualizações
+   - `latest.yml` - Metadados para auto-updater
+4. **✅ Validação** - Verifica se tudo foi criado corretamente
+
+### Via GitHub Actions (Sistema Anterior)
 
 Quando você cria uma tag `v*.*.*`, o GitHub Actions executa:
 
@@ -40,14 +97,9 @@ Quando você cria uma tag `v*.*.*`, o GitHub Actions executa:
 4. **🏗️ Build React** - Compila a interface React
 5. **📦 Build Executável** - Gera o instalador Windows
 6. **🎯 Criar Release** - Publica release automaticamente
-7. **📎 Anexar Arquivos**:
-   - `PDF Commander Setup X.X.X.exe` - Instalador
-   - `PDF Commander Setup X.X.X.exe.blockmap` - Para atualizações
-   - `latest.yml` - Metadados para auto-updater
+7. **📎 Anexar Arquivos** - Mesmo que acima
 
-## 📊 Status do Workflow
-
-Para ver o status dos workflows:
+## 📊 Status e Monitoramento
 1. Vá para aba **"Actions"** no GitHub
 2. Clique no workflow **"🚀 Release PDF Commander"**
 3. Veja os logs detalhados de cada step
