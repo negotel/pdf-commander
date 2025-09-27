@@ -25,11 +25,11 @@ jobs:
     - name: 📋 Verificar arquivos necessários
       run: |
         echo "=== Verificando estrutura do projeto ==="
-        ls -la
+        dir
         echo "=== Verificando config-ui ==="
-        ls -la config-ui/
+        dir config-ui
         echo "=== Verificando package.json do config-ui ==="
-        cat config-ui/package.json | head -10
+        Get-Content config-ui/package.json -Head 10
 
     - name: 🏗️ Build da interface React
       run: |
@@ -44,7 +44,7 @@ jobs:
     - name: 📋 Listar arquivos gerados
       run: |
         echo "=== Arquivos em dist-release ==="
-        ls -la dist-release/
+        dir dist-release
 
     - name: 🎯 Criar Release
       id: create_release
