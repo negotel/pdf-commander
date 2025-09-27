@@ -13,7 +13,7 @@ const ConfiguracaoTab = ({ config, onSave, isDarkMode }) => {
     // Calcular layout sempre que a config mudar
     useEffect(() => {
         calculateLayout();
-    }, [localConfig]);
+    }, [localConfig]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const calculateLayout = () => {
         const paginaDimensoes = {

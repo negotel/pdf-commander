@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Scissors, Upload, FolderOpen, CheckCircle, XCircle, Clock, File } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, File } from 'lucide-react';
 
 const ZPLTab = ({ isDarkMode }) => {
     const [selectedFiles, setSelectedFiles] = useState([]);
@@ -10,7 +10,7 @@ const ZPLTab = ({ isDarkMode }) => {
     const [currentProcessingFile, setCurrentProcessingFile] = useState(null);
     const [showErrorConfirm, setShowErrorConfirm] = useState(false);
     const [errorFileName, setErrorFileName] = useState('');
-    const [pendingFilesQueue, setPendingFilesQueue] = useState([]);
+    const [pendingFilesQueue, setPendingFilesQueue] = useState([]); // eslint-disable-line no-unused-vars
     const [outputDir, setOutputDir] = useState('');
 
     const getIpcRenderer = () => {

@@ -16,7 +16,7 @@ const GerarTab = ({ produtos, config, isDarkMode }) => {
             initialQuantities[produto.id] = quantities[produto.id] || 18;
         });
         setQuantities(initialQuantities);
-    }, [produtos]);
+    }, [produtos, quantities]);
 
     const updateQuantity = (productId, newQuantity) => {
         setQuantities(prev => ({
@@ -131,7 +131,7 @@ const GerarTab = ({ produtos, config, isDarkMode }) => {
             const layout = calculateLayout();
 
             let etiquetasColocadas = 0;
-            let paginaAtual = 0;
+            let paginaAtual = 0; // eslint-disable-line no-unused-vars
 
             for (let i = 0; i < quantityToUse; i++) {
                 const posicaoNaGrade = etiquetasColocadas % layout.etiquetasPorPagina;
@@ -324,7 +324,7 @@ const GerarTab = ({ produtos, config, isDarkMode }) => {
         );
     };
 
-    const layout = calculateLayout();
+    const layout = calculateLayout(); // eslint-disable-line no-unused-vars
 
     return (
         <div className="space-y-6">

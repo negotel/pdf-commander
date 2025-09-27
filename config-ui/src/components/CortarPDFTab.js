@@ -11,7 +11,7 @@ const CortarPDFTab = ({ isDarkMode }) => {
     const [currentProcessingFile, setCurrentProcessingFile] = useState(null);
     const [showErrorConfirm, setShowErrorConfirm] = useState(false);
     const [errorFileName, setErrorFileName] = useState('');
-    const [pendingFilesQueue, setPendingFilesQueue] = useState([]);
+    const [pendingFilesQueue, setPendingFilesQueue] = useState([]); // eslint-disable-line no-unused-vars
 
     const getIpcRenderer = () => {
         try {
