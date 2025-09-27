@@ -173,6 +173,41 @@ Este projeto foi criado utilizando tecnologias de IA para acelerar o desenvolvim
     }
 
     /**
+     * Gera o latest.yml correto para o auto-updater
+     */
+    generateLatestYml(version, tag) {
+        const exeName = `PDF Commander Setup ${version}.exe`;
+        const exePath = path.join('dist-release', exeName);
+
+        if (!fs.existsSync(exePath)) {
+            throw new Error(`Arquivo ${exePath} não encontrado`);
+        }
+
+        const stats = fs.statSync(exePath);
+        const crypto = require('crypto');
+
+        // Calcular SHA512 do arquivo
+        const fileBuffer = fs.readFileSync(exePath);
+        const sha512 = crypto.createHash('sha512').update(fileBuffer).digest('base64');
+
+        const latestYml = `version: ${version}
+files:
+  - url: ${exeName}
+    sha512: ${sha512}
+    size: ${stats.size}
+path: ${exeName}
+sha512: ${sha512}
+releaseDate: '${new Date().toISOString()}'
+`;
+
+        const ymlPath = path.join('dist-release', 'latest.yml');
+        fs.writeFileSync(ymlPath, latestYml, 'utf8');
+
+        console.log('✅ latest.yml gerado corretamente');
+        return ymlPath;
+    }
+
+    /**
      * Executa o processo completo de release
      */
     async runRelease() {
@@ -191,6 +226,9 @@ Este projeto foi criado utilizando tecnologias de IA para acelerar o desenvolvim
 
             // Listar arquivos gerados
             this.listGeneratedFiles();
+
+            // Gerar latest.yml correto
+            this.generateLatestYml(currentVersion, currentTag);
 
             // Criar release
             const release = await this.createRelease(currentTag, currentVersion);
