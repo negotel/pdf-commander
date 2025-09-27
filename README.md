@@ -236,6 +236,10 @@ Contribuições são bem-vindas! Para contribuir:
 
 <div align="center">
 
+**🤖 Desenvolvido com Inteligência Artificial**
+
+Este projeto foi criado utilizando tecnologias de IA para acelerar o desenvolvimento e otimizar a experiência do usuário.
+
 **Feito com ❤️ para simplificar o trabalho com PDFs**
 
 ⭐ Se este projeto foi útil para você, considere dar uma estrela!
