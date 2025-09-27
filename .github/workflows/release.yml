@@ -97,7 +97,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist-release/PDF Commander Setup 1.0.6.exe
+        asset_path: ./dist-release/PDF Commander Setup ${{ github.ref_name }}.exe
         asset_name: PDF Commander Setup ${{ github.ref_name }}.exe
         asset_content_type: application/octet-stream
 
@@ -107,7 +107,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist-release/PDF Commander Setup 1.0.6.exe.blockmap
+        asset_path: ./dist-release/PDF Commander Setup ${{ github.ref_name }}.exe.blockmap
         asset_name: PDF Commander Setup ${{ github.ref_name }}.exe.blockmap
         asset_content_type: application/octet-stream
 
