@@ -219,9 +219,12 @@ Contribuições são bem-vindas! Para contribuir:
 - Atualize a documentação conforme necessário
 - Use commits descritivos
 
-## 📄 Licença
+## � Documentação
 
-Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
+- **[Guia de Contribuição](CONTRIBUTING.md)** - Como contribuir com o projeto
+- **[Changelog](CHANGELOG.md)** - Histórico de versões e mudanças
+- **[Sistema de Atualização](UPDATE_SYSTEM_README.md)** - Documentação técnica do sistema de updates
+- **[Licença MIT](LICENSE)** - Termos de uso e distribuição
 
 ## 👨‍💻 Autor
 
