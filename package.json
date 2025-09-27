@@ -1,6 +1,6 @@
 {
     "name": "pdf-commander",
-    "version": "1.0.9",
+    "version": "2.0.0",
     "description": "PDF Commander - Processador completo de PDFs com interface nativa integrada",
     "main": "main.js",
     "type": "commonjs",
