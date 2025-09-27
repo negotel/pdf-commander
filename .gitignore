@@ -16,7 +16,7 @@ logs/
 saida/
 arquivos/
 entrada/
-etiquetas/
+/etiquetas/
 
 # Temporary files
 *.tmp
@@ -56,3 +56,6 @@ config-ui/package-lock.json
 
 # Update files
 update-check.json
+
+# Token file (sensitive data)
+token
