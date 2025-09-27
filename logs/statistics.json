@@ -1,0 +1,45 @@
+{
+  "operations": [
+    {
+      "type": "etiquetas_generate",
+      "timestamp": "2025-09-27T00:35:48.690Z",
+      "fileName": "teste.pdf",
+      "outputDir": "/tmp/teste",
+      "unido": true
+    },
+    {
+      "type": "zpl_convert",
+      "timestamp": "2025-09-27T00:18:11.575Z",
+      "fileCount": 217,
+      "outputPath": "C:\\Users\\edson\\Downloads\\cortes\\Envio-51219908-Etiquetas-do-volumes_2025-09-27.pdf",
+      "fileName": "Envio-51219908-Etiquetas-do-volumes.txt"
+    },
+    {
+      "type": "zpl_convert",
+      "timestamp": "2025-09-27T00:17:44.342Z",
+      "fileCount": 216,
+      "outputPath": "C:\\Users\\edson\\Downloads\\cortes\\Envio-51867978-Etiquetas-do-volumes_2025-09-27.pdf",
+      "fileName": "Envio-51867978-Etiquetas-do-volumes.txt"
+    },
+    {
+      "type": "zpl_convert",
+      "timestamp": "2025-09-27T00:17:17.007Z",
+      "fileCount": 230,
+      "outputPath": "C:\\Users\\edson\\Downloads\\cortes\\Envio-51946062-Etiquetas-do-volumes_2025-09-27.pdf",
+      "fileName": "Envio-51946062-Etiquetas-do-volumes.txt"
+    },
+    {
+      "type": "zpl_convert",
+      "timestamp": "2025-09-27T00:16:48.469Z",
+      "fileCount": 302,
+      "outputPath": "C:\\Users\\edson\\Downloads\\cortes\\Envio-51946104-Etiquetas-do-volumes_2025-09-27.pdf",
+      "fileName": "Envio-51946104-Etiquetas-do-volumes.txt"
+    }
+  ],
+  "summary": {
+    "pdfs": 0,
+    "zpl": 4,
+    "etiquetas": 1,
+    "total": 5
+  }
+}

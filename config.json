@@ -1,0 +1,46 @@
+{
+  "pageSize": {
+    "target": {
+      "width": 100,
+      "height": 145,
+      "unit": "mm"
+    },
+    "output": {
+      "width": 210,
+      "height": 297,
+      "unit": "mm",
+      "name": "A4"
+    }
+  },
+  "output": {
+    "type": "both",
+    "formats": {
+      "single": {
+        "enabled": true,
+        "filename": "documento_unido.pdf"
+      },
+      "grid": {
+        "enabled": true,
+        "filename": "composto_4por_folha.pdf",
+        "itemsPerPage": 4,
+        "layout": "2x2"
+      }
+    }
+  },
+  "printer": {
+    "enabled": false,
+    "name": "",
+    "autoSend": false,
+    "copies": 1
+  },
+  "cleanup": {
+    "deleteNormalized": true,
+    "createBackup": true,
+    "deleteOriginals": false
+  },
+  "paths": {
+    "input": "entrada",
+    "output": "saida",
+    "normalized": "saida/normalizados"
+  }
+}

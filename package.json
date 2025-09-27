@@ -1,0 +1,75 @@
+{
+    "name": "unir-pdfs",
+    "version": "1.0.0",
+    "description": "Processador de PDFs com interface nativa integrada",
+    "main": "main.js",
+    "type": "commonjs",
+    "scripts": {
+        "start": "electron .",
+        "build:exe": "electron-builder",
+        "postbuild": "node copy-dlls.js",
+        "build:pkg": "pkg -t node18-win-x64 --compress Brotli --public -o dist/monta-pdf.exe index.js",
+        "config": "node open-config.js",
+        "dev": "electron . --dev"
+    },
+    "dependencies": {
+        "axios": "^1.12.1",
+        "canvas": "^3.2.0",
+        "express": "^4.21.2",
+        "fs-extra": "^11.2.0",
+        "html2canvas": "^1.4.1",
+        "jsbarcode": "^3.12.1",
+        "jspdf": "^3.0.2",
+        "node-fetch": "^2.7.0",
+        "pdf-lib": "^1.17.1",
+        "pdfkit": "^0.17.2"
+    },
+    "devDependencies": {
+        "electron": "^33.0.2",
+        "electron-builder": "^25.1.8",
+        "pkg": "^5.8.1"
+    },
+    "build": {
+        "appId": "com.processadorpdfs.app",
+        "productName": "Processador",
+        "directories": {
+            "output": "dist-release"
+        },
+        "asar": true,
+        "files": [
+            "**/*",
+            "!entrada/**/*",
+            "!saida/**/*",
+            "!logs/**/*",
+            "!dist-final/**/*",
+            "!.git/**/*",
+            "!*.md",
+            "!config-ui/src/**/*",
+            "!config-ui/node_modules/**/*",
+            "config-ui/build/**/*",
+            "config-ui/public/index.html"
+        ],
+        "win": {
+            "target": {
+                "target": "nsis",
+                "arch": [
+                    "x64"
+                ]
+            }
+        },
+        "nsis": {
+            "oneClick": false,
+            "allowToChangeInstallationDirectory": true,
+            "createDesktopShortcut": true,
+            "createStartMenuShortcut": true
+        }
+    },
+    "keywords": [
+        "pdf",
+        "processor",
+        "electron",
+        "desktop-app"
+    ],
+    "author": "Edson Costa",
+    "license": "MIT"
+}

@@ -1,0 +1,434 @@
+.App {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+}
+
+.App-header {
+  background-color: #282c34;
+  padding: 20px;
+  color: white;
+  margin-bottom: 30px;
+  border-radius: 8px;
+}
+
+.App-header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.config-form {
+  text-align: left;
+}
+
+.config-section {
+  background: #f8f9fa;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.config-section h2 {
+  margin-top: 0;
+  color: #495057;
+  font-size: 1.3rem;
+  border-bottom: 2px solid #dee2e6;
+  padding-bottom: 10px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #495057;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #495057;
+  cursor: pointer;
+  margin-bottom: 0;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+}
+
+.checkbox-group input[type="text"] {
+  flex: 1;
+  min-width: 200px;
+}
+
+.save-section {
+  text-align: center;
+  margin-top: 30px;
+  padding: 20px;
+}
+
+.save-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.save-button:hover {
+  background-color: #218838;
+}
+
+.save-button:active {
+  transform: translateY(1px);
+}
+
+.save-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.processing-status {
+  background: #e7f3ff;
+  border: 1px solid #b3d9ff;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 10px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.processing-status p {
+  margin: 10px 0;
+  font-weight: 600;
+  color: #007bff;
+}
+
+.completed-files {
+  margin-top: 15px;
+  text-align: left;
+}
+
+.completed-files h4 {
+  margin: 0 0 10px;
+  color: #28a745;
+}
+
+.completed-files ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.completed-files li {
+  padding: 5px 0;
+  color: #28a745;
+  font-weight: 500;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .App {
+    padding: 10px;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .checkbox-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .checkbox-group input[type="text"] {
+    width: 100%;
+    min-width: unset;
+  }
+}
+
+/* Dark Mode Styles */
+body.dark {
+  background-color: #111827;
+  color: #f9fafb;
+}
+
+body.light {
+  background-color: #ffffff;
+  color: #111827;
+}
+
+/* Dark mode para seções de configuração */
+.dark .config-section {
+  background: #1f2937;
+  border: 1px solid #374151;
+}
+
+.dark .config-section h2 {
+  color: #f9fafb;
+  border-bottom: 2px solid #374151;
+}
+
+.dark .form-group label {
+  color: #f9fafb;
+}
+
+.dark .form-group input,
+.dark .form-group select {
+  background-color: #374151;
+  border: 1px solid #4b5563;
+  color: #f9fafb;
+}
+
+.dark .form-group input:focus,
+.dark .form-group select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}
+
+.dark .checkbox-group label {
+  color: #f9fafb;
+}
+
+/* Dark mode para status de processamento */
+.dark .processing-status {
+  background: #1e3a8a;
+  border: 1px solid #3b82f6;
+}
+
+.dark .processing-status p {
+  color: #93c5fd;
+}
+
+/* Dark mode para header */
+.dark .App-header {
+  background-color: #1f2937;
+  border: 1px solid #374151;
+}
+
+/* Dark mode para botões */
+.dark .save-button {
+  background-color: #059669;
+}
+
+.dark .save-button:hover {
+  background-color: #047857;
+}
+
+.dark .save-button:disabled {
+  background-color: #4b5563;
+}
+
+/* Transições suaves */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Estilo para o toggle de tema */
+.theme-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.05);
+}
+
+/* Melhorias para dark mode */
+.dark input::placeholder,
+.dark select::placeholder {
+  color: #9ca3af;
+}
+
+.dark .completed-files h4 {
+  color: #10b981;
+}
+
+.dark .completed-files li {
+  color: #10b981;
+}
+
+/* Card styles para dark mode */
+.card {
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid;
+  transition: all 0.3s ease;
+}
+
+.dark .card {
+  background-color: #1f2937;
+  border-color: #374151;
+}
+
+.card:not(.dark .card) {
+  background-color: #ffffff;
+  border-color: #e5e7eb;
+}
+
+
+
+.card:not(.dark .card):hover {
+  background-color: #f9fafb;
+}
+
+/* Botões responsivos para dark mode */
+.btn-primary {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #2563eb;
+}
+
+.btn-primary:disabled {
+  background-color: #6b7280;
+  cursor: not-allowed;
+}
+
+.dark .btn-primary {
+  background-color: #3b82f6;
+}
+
+.dark .btn-primary:hover {
+  background-color: #2563eb;
+}
+
+.dark .btn-primary:disabled {
+  background-color: #4b5563;
+}
+
+.btn-secondary {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: #e5e7eb;
+}
+
+.dark .btn-secondary {
+  background-color: #374151;
+  color: #f9fafb;
+  border-color: #4b5563;
+}
+
+.dark .btn-secondary:hover {
+  background-color: #4b5563;
+}
+
+/* Animações de entrada */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Color primárias para uso em gradientes */
+.primary {
+  color: #f25c2e;
+}
+
+.from-primary {
+  --tw-gradient-from: #f25c2e;
+}
+
+.to-primary-dark {
+  --tw-gradient-to: #e73e23;
+}
