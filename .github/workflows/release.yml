@@ -54,12 +54,10 @@ jobs:
 
     - name: 🎯 Criar Release
       id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v1
       with:
         tag_name: ${{ github.ref_name }}
-        release_name: PDF Commander ${{ github.ref_name }}
+        name: PDF Commander ${{ github.ref_name }}
         body: |
           🎉 **PDF Commander ${{ github.ref_name }}**
 
@@ -86,33 +84,9 @@ jobs:
           **⭐ Se este projeto foi útil para você, considere dar uma estrela!**
         draft: false
         prerelease: false
-
-    - name: 📎 Anexar instalador ao Release
-      uses: actions/upload-release-asset@v1
+        files: |
+          ./dist-release/PDF Commander Setup ${{ github.ref_name }}.exe
+          ./dist-release/PDF Commander Setup ${{ github.ref_name }}.exe.blockmap
+          ./dist-release/latest.yml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist-release/PDF Commander Setup ${{ github.ref_name }}.exe
-        asset_name: PDF Commander Setup ${{ github.ref_name }}.exe
-        asset_content_type: application/octet-stream
-
-    - name: 📎 Anexar blockmap (para atualizações)
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist-release/PDF Commander Setup ${{ github.ref_name }}.exe.blockmap
-        asset_name: PDF Commander Setup ${{ github.ref_name }}.exe.blockmap
-        asset_content_type: application/octet-stream
-
-    - name: 📎 Anexar latest.yml (para auto-updater)
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist-release/latest.yml
-        asset_name: latest.yml
-        asset_content_type: application/x-yaml
