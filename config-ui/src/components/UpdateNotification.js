@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Download, X, RefreshCw, AlertCircle } from 'lucide-react';
+import { APP_CONFIG } from '../config';
 
 const UpdateNotification = ({ isDarkMode, show, onClose }) => {
     const [updateData, setUpdateData] = useState(null);
@@ -139,52 +140,90 @@ const UpdateNotification = ({ isDarkMode, show, onClose }) => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className={`rounded-lg shadow-xl border max-w-md w-full ${
+            <div className={`rounded-lg shadow-xl border max-w-md w-full p-6 ${
                 isDarkMode
                     ? 'bg-gray-800 border-gray-700 text-white'
                     : 'bg-white border-gray-200 text-gray-900'
             }`}>
                 {/* Header */}
-                <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center space-x-2">
-                        <AlertCircle className="w-5 h-5 text-blue-500" />
-                        <h3 className="font-semibold text-lg">Atualização Disponível</h3>
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                        <div className="flex-shrink-0">
+                            <AlertCircle className="w-6 h-6 text-blue-500" />
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-lg">Atualização Disponível</h3>
+                            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                Uma nova versão está pronta para instalação
+                            </p>
+                        </div>
                     </div>
                     <button
                         onClick={handleDismiss}
                         className={`p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors ${
-                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                            isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-800'
                         }`}
+                        title="Fechar"
                     >
-                        <X className="w-4 h-4" />
+                        <X className="w-5 h-5" />
                     </button>
                 </div>
 
-                {/* Conteúdo */}
-                <div className="mb-4">
-                    <p className={`text-sm mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Nova versão disponível: <strong>{updateData.version}</strong>
-                    </p>
-
-                    {updateData.releaseNotes && (
-                        <div className={`text-sm mb-3 p-2 rounded border max-h-32 overflow-y-auto ${
-                            isDarkMode
-                                ? 'bg-gray-700 border-gray-600 text-gray-300'
-                                : 'bg-gray-50 border-gray-200 text-gray-700'
+                {/* Informações da Versão */}
+                <div className={`p-4 rounded-lg mb-4 ${
+                    isDarkMode ? 'bg-gray-700/50' : 'bg-blue-50'
+                }`}>
+                    <div className="flex items-center justify-between mb-2">
+                        <span className={`text-sm font-medium ${
+                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
                         }`}>
-                            <div dangerouslySetInnerHTML={{
-                                __html: updateData.releaseNotes.replace(/\n/g, '<br>')
-                            }} />
-                        </div>
-                    )}
-
-                    {error && (
-                        <div className="text-sm text-red-500 mb-3 flex items-center space-x-1">
-                            <AlertCircle className="w-4 h-4" />
-                            <span>{error}</span>
-                        </div>
-                    )}
+                            Versão Atual:
+                        </span>
+                        <span className={`text-sm px-2 py-1 rounded ${
+                            isDarkMode ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-700'
+                        }`}>
+                            {APP_CONFIG.version}
+                        </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <span className={`text-sm font-medium ${
+                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                        }`}>
+                            Nova Versão:
+                        </span>
+                        <span className={`text-sm px-2 py-1 rounded bg-blue-500 text-white font-medium`}>
+                            {updateData.version}
+                        </span>
+                    </div>
                 </div>
+
+                {/* Release Notes */}
+                {updateData.releaseNotes && (
+                    <div className={`text-sm mb-4 p-3 rounded-lg border max-h-32 overflow-y-auto ${
+                        isDarkMode
+                            ? 'bg-gray-700/30 border-gray-600 text-gray-300'
+                            : 'bg-gray-50 border-gray-200 text-gray-700'
+                    }`}>
+                        <h4 className={`font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                            Novidades desta versão:
+                        </h4>
+                        <div dangerouslySetInnerHTML={{
+                            __html: updateData.releaseNotes.replace(/\n/g, '<br>')
+                        }} />
+                    </div>
+                )}
+
+                {/* Mensagem de erro */}
+                {error && (
+                    <div className={`p-3 rounded-lg mb-4 border ${
+                        isDarkMode ? 'bg-red-900/20 border-red-700 text-red-300' : 'bg-red-50 border-red-200 text-red-700'
+                    }`}>
+                        <div className="flex items-center space-x-2">
+                            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">{error}</span>
+                        </div>
+                    </div>
+                )}
 
                 {/* Progress Bar (quando baixando) */}
                 {isDownloading && (
