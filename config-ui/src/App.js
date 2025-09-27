@@ -154,9 +154,9 @@ function App() {
         <div className={`min-h-screen transition-colors duration-300 ${
             isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'
         }`}>
-            <div className="max-w-7xl mx-auto p-6">
-                {/* Header */}
-                <header className="mb-8">
+            {/* Header - Largura Total */}
+            <header className="sticky top-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm py-4 border-b border-gray-200/50 dark:border-gray-700/50">
+                <div className="max-w-7xl mx-auto px-6">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
                             <h1 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -234,10 +234,12 @@ function App() {
                             )}
                         </div>
                     </div>
-                </header>
+                </div>
+            </header>
 
-                {/* Conteúdo Principal */}
-                <main className="fade-in">
+            {/* Conteúdo Principal */}
+            <div className="max-w-7xl mx-auto p-6">
+                <main className="fade-in pt-4">
                     {currentPage === 'home' && (
                         <HomePage onNavigate={showPage} isDarkMode={isDarkMode} />
                     )}
