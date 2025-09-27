@@ -51,6 +51,8 @@ jobs:
       run: |
         echo "=== Arquivos em dist-release ==="
         dir dist-release
+        echo "=== Conteúdo do package.json ==="
+        type package.json | findstr "version"
 
     - name: 🎯 Criar Release
       id: create_release
@@ -85,8 +87,8 @@ jobs:
         draft: false
         prerelease: false
         files: |
-          ./dist-release/PDF Commander Setup ${{ github.ref_name }}.exe
-          ./dist-release/PDF Commander Setup ${{ github.ref_name }}.exe.blockmap
+          ./dist-release/PDF Commander Setup*.exe
+          ./dist-release/PDF Commander Setup*.exe.blockmap
           ./dist-release/latest.yml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
