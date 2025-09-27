@@ -210,12 +210,12 @@ releaseDate: '${new Date().toISOString()}'
     /**
      * Executa o processo completo de release
      */
-    async runRelease() {
+    async runRelease(tagOverride = null) {
         try {
             console.log('🚀 Iniciando processo de release automático...\n');
 
-            // Verificar se estamos em uma tag
-            const currentTag = this.getCurrentTag();
+            // Usar tag do parâmetro ou obter automaticamente
+            const currentTag = tagOverride || this.getCurrentTag();
             const currentVersion = this.getCurrentVersion();
 
             console.log(`📋 Tag atual: ${currentTag}`);
@@ -267,8 +267,9 @@ releaseDate: '${new Date().toISOString()}'
 
 // Executar se chamado diretamente
 if (require.main === module) {
+    const tagArg = process.argv[2]; // Pegar tag do argumento da linha de comando
     const releaseManager = new GitHubReleaseManager();
-    releaseManager.runRelease();
+    releaseManager.runRelease(tagArg);
 }
 
 module.exports = GitHubReleaseManager;
