@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Download, X, RefreshCw, AlertCircle } from 'lucide-react';
 
-const UpdateNotification = ({ isDarkMode }) => {
+const UpdateNotification = ({ isDarkMode, show, onClose }) => {
     const [updateData, setUpdateData] = useState(null);
     const [isDownloading, setIsDownloading] = useState(false);
     const [downloadProgress, setDownloadProgress] = useState(0);
     const [isInstalling, setIsInstalling] = useState(false);
-    const [showNotification, setShowNotification] = useState(false);
     const [error, setError] = useState(null);
 
     // Verificar se está rodando no Electron
@@ -57,7 +56,6 @@ const UpdateNotification = ({ isDarkMode }) => {
 
             if (result.success && result.updateData) {
                 setUpdateData(result.updateData);
-                setShowNotification(true);
                 setError(null);
             }
         } catch (err) {
@@ -113,24 +111,27 @@ const UpdateNotification = ({ isDarkMode }) => {
     };
 
     const handleDismiss = () => {
-        setShowNotification(false);
+        onClose();
     };
 
     const handleRemindLater = () => {
         // Esconder por 24 horas
-        setShowNotification(false);
+        onClose();
         setTimeout(() => {
-            setShowNotification(true);
+            // Reabrir após 24 horas se ainda houver update disponível
+            if (updateData) {
+                // Aqui poderíamos reabrir o modal, mas por simplicidade vamos apenas limpar o estado
+            }
         }, 24 * 60 * 60 * 1000); // 24 horas
     };
 
-    if (!showNotification || !updateData) {
+    if (!show || !updateData) {
         return null;
     }
 
     return (
-        <div className="fixed top-4 right-4 z-50 max-w-md">
-            <div className={`rounded-lg shadow-lg border p-4 ${
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className={`rounded-lg shadow-xl border max-w-md w-full ${
                 isDarkMode
                     ? 'bg-gray-800 border-gray-700 text-white'
                     : 'bg-white border-gray-200 text-gray-900'

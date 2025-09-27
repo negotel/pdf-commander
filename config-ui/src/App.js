@@ -8,6 +8,7 @@ import CortarPDFTab from './components/CortarPDFTab';
 import MonitoringAdmin from './components/MonitoringAdmin';
 import StatisticsPage from './components/StatisticsPage';
 import UpdateNotification from './components/UpdateNotification';
+import HeaderMenu from './components/HeaderMenu';
 import { Logo } from './components/Logo';
 import { useTheme } from './contexts/ThemeContext';
 
@@ -16,6 +17,7 @@ function App() {
     const [currentPage, setCurrentPage] = useState('home');
     const [adminMode, setAdminMode] = useState(false); // Modo admin secreto
     const [keySequence, setKeySequence] = useState([]); // Sequência de teclas
+    const [showUpdateNotification, setShowUpdateNotification] = useState(false);
     const [config, setConfig] = useState({
         pageSize: {
             target: { width: 100, height: 145, unit: "mm" },
@@ -112,6 +114,10 @@ function App() {
         console.log('🔒 Modo administrador desativado');
     };
 
+    const onCheckUpdates = () => {
+        setShowUpdateNotification(true);
+    };
+
     // Salvar configurações de etiquetas
     const saveEtiquetasConfig = (newConfig) => {
         setEtiquetasConfig(newConfig);
@@ -156,13 +162,6 @@ function App() {
                             <h1 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                 <Logo />
                             </h1>
-                            <span className={`text-sm px-2 py-1 rounded ${
-                                isDarkMode 
-                                    ? 'text-gray-300 bg-gray-700' 
-                                    : 'text-gray-500 bg-gray-100'
-                            }`}>
-                                PRIMESLOGS
-                            </span>
                             {adminMode && (
                                 <span className={`text-xs px-2 py-1 rounded border ${
                                     isDarkMode
@@ -188,18 +187,12 @@ function App() {
                                 📊
                             </button>
 
-                            {/* Toggle de tema */}
-                            <button
-                                onClick={toggleTheme}
-                                className={`p-2 rounded-lg transition-colors ${
-                                    isDarkMode 
-                                        ? 'bg-gray-700 hover:bg-gray-600 text-yellow-400' 
-                                        : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
-                                }`}
-                                title={`Alternar para modo ${isDarkMode ? 'claro' : 'escuro'}`}
-                            >
-                                {isDarkMode ? '☀️' : '🌙'}
-                            </button>
+                            {/* Menu Header */}
+                            <HeaderMenu
+                                isDarkMode={isDarkMode}
+                                toggleTheme={toggleTheme}
+                                onCheckUpdates={onCheckUpdates}
+                            />
 
                             {adminMode && (
                                 <>
@@ -287,7 +280,11 @@ function App() {
                 </main>
 
                 {/* Notificação de atualização */}
-                <UpdateNotification isDarkMode={isDarkMode} />
+                <UpdateNotification
+                    isDarkMode={isDarkMode}
+                    show={showUpdateNotification}
+                    onClose={() => setShowUpdateNotification(false)}
+                />
             </div>
         </div>
     );

@@ -257,6 +257,8 @@ releaseDate: '${new Date().toISOString()}'
             console.log(`🔗 URL da release: ${release.html_url}`);
 
         } catch (error) {
+            console.log(error);
+            
             console.error('❌ Erro durante o release:', error.message);
             process.exit(1);
         }

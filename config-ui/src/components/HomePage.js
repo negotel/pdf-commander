@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { APP_CONFIG } from '../config';
 import { RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 
 const HomePage = ({ onNavigate, isDarkMode }) => {
@@ -204,15 +203,6 @@ const HomePage = ({ onNavigate, isDarkMode }) => {
                         </div>
                     </div>
                 </div>
-            </div>
-
-            {/* Footer Info */}
-            <div className={`text-center text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                <p>
-                    Desenvolvido para <strong>PRIMESLOGS</strong> •
-                    Versão {APP_CONFIG.version} •
-                    {new Date().getFullYear()}
-                </p>
             </div>
         </div>
     );

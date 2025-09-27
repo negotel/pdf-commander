@@ -40,7 +40,9 @@ function createWindow() {
         show: true,
         center: true,
         resizable: true,
-        alwaysOnTop: false
+        alwaysOnTop: false,
+        fullscreen: true, // Abrir em fullscreen
+        maximizable: false // Remover botão maximizar
     });
 
     // Carrega a interface React
