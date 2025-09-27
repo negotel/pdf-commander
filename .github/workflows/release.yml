@@ -22,6 +22,15 @@ jobs:
     - name: 📦 Instalar dependências
       run: npm ci
 
+    - name: 📋 Verificar arquivos necessários
+      run: |
+        echo "=== Verificando estrutura do projeto ==="
+        ls -la
+        echo "=== Verificando config-ui ==="
+        ls -la config-ui/
+        echo "=== Verificando package.json do config-ui ==="
+        cat config-ui/package.json | head -10
+
     - name: 🏗️ Build da interface React
       run: |
         cd config-ui
