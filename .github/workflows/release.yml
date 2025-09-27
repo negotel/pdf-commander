@@ -25,7 +25,7 @@ jobs:
     - name: 📦 Instalar dependências (Config-UI)
       run: |
         cd config-ui
-        npm install
+        npm ci
         cd ..
 
     - name: 🏗️ Build da interface React
@@ -40,9 +40,11 @@ jobs:
         path: |
           ~/.cache/electron
           ~/.cache/electron-builder
-        key: ${{ runner.os }}-electron-${{ hashFiles('package-lock.json') }}
+          node_modules
+          config-ui/node_modules
+        key: ${{ runner.os }}-build-${{ hashFiles('package-lock.json', 'config-ui/package-lock.json') }}
         restore-keys: |
-          ${{ runner.os }}-electron-
+          ${{ runner.os }}-build-
 
     - name: 📦 Build do executável
       run: npm run build:exe

@@ -1,0 +1,68 @@
+name: 🚀 Build PDF Commander
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+      - 'config-ui/**'
+      - 'main.js'
+      - 'package.json'
+      - 'config.json'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: 📥 Checkout código
+      uses: actions/checkout@v4
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: 📦 Instalar dependências (Root)
+      run: npm ci
+
+    - name: 📦 Instalar dependências (Config-UI)
+      run: |
+        cd config-ui
+        npm ci
+        cd ..
+
+    - name: 🏗️ Build da interface React
+      run: |
+        cd config-ui
+        npm run build
+        cd ..
+
+    - name: ⚡ Cache Electron Builder
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/electron
+          ~/.cache/electron-builder
+          node_modules
+          config-ui/node_modules
+        key: ${{ runner.os }}-build-${{ hashFiles('package-lock.json', 'config-ui/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-build-
+
+    - name: 📦 Build do executável
+      run: npm run build:exe
+
+    - name: 📋 Listar arquivos gerados
+      run: |
+        echo "=== Arquivos em dist-release ==="
+        dir dist-release
+
+    - name: 💾 Upload Build Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: pdf-commander-build-${{ github.sha }}
+        path: |
+          dist-release/
+        retention-days: 7
