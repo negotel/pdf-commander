@@ -41,8 +41,10 @@ function createWindow() {
         center: true,
         resizable: true,
         alwaysOnTop: false,
-        fullscreen: true, // Abrir em fullscreen
-        maximizable: false // Remover botão maximizar
+        fullscreen: false, // Não ocupar toda a tela (barra de tarefas)
+        maximizable: false, // Remover botão maximizar
+        minimizable: true,  // Manter botão minimizar
+        closable: true      // Manter botão fechar
     });
 
     // Carrega a interface React
@@ -53,6 +55,7 @@ function createWindow() {
         mainWindow.loadURL('http://localhost:3001').then(() => {
             console.log('Interface React carregada com sucesso!');
             mainWindow.show();
+            mainWindow.maximize(); // Maximizar janela
             mainWindow.focus();
         }).catch(err => {
             console.error('Erro ao carregar interface React, usando HTML:', err);
@@ -75,6 +78,7 @@ function createWindow() {
         mainWindow.loadFile(buildPath).then(() => {
             console.log('Interface React (build) carregada com sucesso!');
             mainWindow.show();
+            mainWindow.maximize(); // Maximizar janela
             mainWindow.focus();
         }).catch(err => {
             console.error('ERRO CRÍTICO - Não foi possível carregar a interface:', err);
@@ -100,6 +104,7 @@ function createWindow() {
             
             // Mostrar janela mesmo com erro para debug
             mainWindow.show();
+            mainWindow.maximize(); // Maximizar janela
         });
     }
 
@@ -110,6 +115,7 @@ function createWindow() {
     mainWindow.once('ready-to-show', () => {
         console.log('Janela pronta para exibir');
         mainWindow.show();
+        mainWindow.maximize(); // Maximizar janela
         
         // Relatar inicialização do sistema
         monitoring.reportSystemStart().catch(err => {
