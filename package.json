@@ -30,8 +30,8 @@
         "pkg": "^5.8.1"
     },
     "build": {
-        "appId": "com.processadorpdfs.app",
-        "productName": "Processador",
+        "appId": "com.pdfcommander.app",
+        "productName": "PDF Commander",
         "directories": {
             "output": "dist-release"
         },
