@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import JsBarcode from 'jsbarcode';
 import QRCode from 'qrcode';
 import { jsPDF } from 'jspdf';
+import { PAGINA_DIMENSOES, DEFAULT_CAMPOS_ETIQUETA } from './etiquetas.constants';
 
 const GerarTab = ({ produtos, config, isDarkMode }) => {
     const [isGenerating, setIsGenerating] = useState(false);
@@ -29,7 +30,8 @@ const GerarTab = ({ produtos, config, isDarkMode }) => {
         const paginaDimensoes = {
             'A4': { largura: 210, altura: 297 },
             'A5': { largura: 148, altura: 210 },
-            'Carta': { largura: 216, altura: 279 }
+            'Carta': { largura: 216, altura: 279 },
+            'Etiqueta': { largura: 100, altura: 150 }
         };
 
         const pagina = paginaDimensoes[config.tamanhoPagina] || paginaDimensoes['A4'];
@@ -92,7 +94,7 @@ const GerarTab = ({ produtos, config, isDarkMode }) => {
     const generateBarcodeDataURL = async (code, tipoCodigo = null) => {
         try {
             const tipoCodigoFinal = tipoCodigo || config.tipoCodigo || 'code128';
-            
+
             if (tipoCodigoFinal === 'qrcode') {
                 // Gerar QR Code
                 const qrDataURL = await QRCode.toDataURL(code, {
@@ -127,7 +129,13 @@ const GerarTab = ({ produtos, config, isDarkMode }) => {
         const quantityToUse = qty || quantities[produto.id] || 18;
         setIsGenerating(true);
         try {
-            const pdf = new jsPDF('p', 'mm', config.tamanhoPagina.toLowerCase() || 'a4');
+            const tamanhosPadrao = ['a4', 'a5', 'letter'];
+            const nomePagina = config.tamanhoPagina.toLowerCase();
+            const paginaDim = PAGINA_DIMENSOES[config.tamanhoPagina] || PAGINA_DIMENSOES['A4'];
+            const formatoPDF = tamanhosPadrao.includes(nomePagina)
+                ? nomePagina
+                : [paginaDim.largura, paginaDim.altura];
+            const pdf = new jsPDF('p', 'mm', formatoPDF);
             const layout = calculateLayout();
 
             let etiquetasColocadas = 0;
@@ -162,105 +170,82 @@ const GerarTab = ({ produtos, config, isDarkMode }) => {
     };
 
     const drawLabel = async (pdf, produto, x, y, width, height) => {
-        // Configurar fonte para descrição
-        const tamanhoFonteDescricao = Math.max(6, Math.min(30, config.tamanhoFonteDescricao || 12));
-        const pesoFonteDescricao = config.pesoFonteDescricao || 'normal';
-        const tamanhoFonteCodigo = Math.max(4, Math.min(24, config.tamanhoFonteCodigo || 10));
-        const pesoFonteCodigo = config.pesoFonteCodigo || 'bold';
-
-        pdf.setFontSize(tamanhoFonteDescricao);
-        pdf.setFont('helvetica', pesoFonteDescricao);
-
-        // Gerar e adicionar código primeiro
+        const fDesc = Math.max(6, Math.min(30, config.tamanhoFonteDescricao || 11));
+        const wDesc = config.pesoFonteDescricao || 'normal';
+        const fCode = Math.max(4, Math.min(24, config.tamanhoFonteCodigo || 10));
+        const wCode = config.pesoFonteCodigo || 'bold';
         const tipoCodigo = produto.tipoCodigo || config.tipoCodigo || 'code128';
-        const barcodeDataURL = await generateBarcodeDataURL(produto.codigo, tipoCodigo);
-        let barcodeY;
-        
-        if (barcodeDataURL) {
-            let barcodeWidth, barcodeHeight;
-            
-            if (tipoCodigo === 'qrcode') {
-                // QR Code é quadrado
-                const qrSize = Math.min(width * 0.6, height * 0.4); // Limitar tamanho
-                barcodeWidth = qrSize;
-                barcodeHeight = qrSize;
-            } else {
-                // Code 128 é retangular
-                barcodeWidth = width * 0.6;
-                barcodeHeight = 12;
+        const campos = (produto.camposEtiqueta || DEFAULT_CAMPOS_ETIQUETA).filter(c => c.visivel);
+        const PAD = 1.5; // padding interno mm
+
+        // Borda da etiqueta
+        if (produto.mostrarBorda) {
+            pdf.setDrawColor(0, 0, 0);
+            pdf.setLineWidth(0.3);
+            pdf.rect(x, y, width, height);
+        }
+
+        // Pré-gerar barcode
+        let barcodeDataURL = null;
+        if (campos.some(c => c.id === 'barcode')) {
+            barcodeDataURL = await generateBarcodeDataURL(produto.codigo, tipoCodigo);
+        }
+
+        // ---- Calcular alturas fixas de cada campo visível ----
+        const getH = (id) => {
+            if (id === 'barcode') return tipoCodigo === 'qrcode' ? height * 0.42 : height * 0.38;
+            if (id === 'codigo') return fCode * 0.45;
+            if (id === 'descricao') {
+                pdf.setFontSize(fDesc);
+                const lines = pdf.splitTextToSize(produto.descricao, width - PAD * 2);
+                return lines.length * (fDesc * 0.38) + 1;
             }
-            
-            const barcodeX = x + (width - barcodeWidth) / 2; // centralizar
-            
-            // Ajustar posição Y baseado no tipo de código
-            if (tipoCodigo === 'qrcode') {
-                // Para QR Code, subir mais para dar espaço ao texto abaixo
-                barcodeY = y + height - barcodeHeight - 12; // Mais espaço para texto
-            } else {
-                // Para Code 128, manter posição original
-                barcodeY = y + height - barcodeHeight - 8;
+            if (id === 'info' && produto.informacaoAdicional) return fCode * 0.40;
+            return 0;
+        };
+
+        const totalH = campos.reduce((acc, c) => acc + getH(c.id), 0);
+        const offsetY = y + PAD + Math.max(0, (height - PAD * 2 - totalH) / 2);
+        let curY = offsetY;
+
+        for (const campo of campos) {
+            const h = getH(campo.id);
+            if (h === 0) { continue; }
+
+            if (campo.id === 'barcode' && barcodeDataURL) {
+                if (tipoCodigo === 'qrcode') {
+                    const sz = Math.min(width - PAD * 2, h);
+                    pdf.addImage(barcodeDataURL, 'PNG', x + (width - sz) / 2, curY, sz, sz);
+                } else {
+                    const bw = width - PAD * 2;
+                    const bh = h * 0.85;
+                    pdf.addImage(barcodeDataURL, 'PNG', x + PAD, curY + (h - bh) / 2, bw, bh);
+                }
+            } else if (campo.id === 'codigo') {
+                pdf.setFontSize(fCode);
+                pdf.setFont('helvetica', wCode);
+                pdf.setTextColor(0, 0, 0);
+                const tw = pdf.getTextWidth(produto.codigo);
+                pdf.text(produto.codigo, x + (width - tw) / 2, curY + h);
+            } else if (campo.id === 'descricao') {
+                pdf.setFontSize(fDesc);
+                pdf.setFont('helvetica', wDesc);
+                pdf.setTextColor(0, 0, 0);
+                const lines = pdf.splitTextToSize(produto.descricao, width - PAD * 2);
+                const lh = fDesc * 0.38;
+                lines.forEach((line, i) => {
+                    pdf.text(line, x + PAD, curY + lh + i * lh);
+                });
+            } else if (campo.id === 'info' && produto.informacaoAdicional) {
+                const fs = Math.max(6, fCode - 1);
+                pdf.setFontSize(fs);
+                pdf.setFont('helvetica', 'bold');
+                pdf.setTextColor(0, 0, 180);
+                pdf.text(produto.informacaoAdicional, x + PAD, curY + h);
+                pdf.setTextColor(0, 0, 0);
             }
 
-            pdf.addImage(barcodeDataURL, 'PNG', barcodeX, barcodeY, barcodeWidth, barcodeHeight);
-        }
-
-        // Desenhar descrição do produto próxima ao código
-        const maxWidth = width - 1; // margem interna reduzida
-        const descricaoLines = pdf.splitTextToSize(produto.descricao, maxWidth);
-
-        // Posicionar descrição logo acima do código de barras
-        const espacoEntreDescricaoEBarcode = 4; // espaço entre descrição e barcode
-        const alturaDescricao = descricaoLines.length * (tamanhoFonteDescricao * 0.35);
-        const startY = barcodeY - espacoEntreDescricaoEBarcode - alturaDescricao + (tamanhoFonteDescricao * 0.35);
-        
-        descricaoLines.forEach((line, index) => {
-            const textWidth = pdf.getTextWidth(line);
-            const centeredX = x + (width - textWidth) / 2;
-            pdf.text(line, centeredX, startY + (index * (tamanhoFonteDescricao * 0.35)));
-        });
-
-        // Renderizar código numérico separadamente
-        pdf.setFontSize(tamanhoFonteCodigo);
-        pdf.setFont('helvetica', pesoFonteCodigo);
-
-        // Ajustar tamanho da fonte para QR Code (menor)
-        if (tipoCodigo === 'qrcode') {
-            const tamanhoFonteQR = Math.max(6, tamanhoFonteCodigo - 2); // Fonte menor para QR Code
-            pdf.setFontSize(tamanhoFonteQR);
-        }
-
-        const codeWidth = pdf.getTextWidth(produto.codigo);
-        const codeX = x + (width - codeWidth) / 2; // centralizar
-        
-        // Ajustar posição baseado no tipo de código
-        let codeY;
-        if (tipoCodigo === 'qrcode') {
-            // Para QR Code, manter próximo da borda inferior
-            codeY = produto.informacaoAdicional ? y + height - 7 : y + height - 4;
-        } else {
-            // Para Code 128, manter posição original
-            codeY = produto.informacaoAdicional ? y + height - 7 : y + height - 4;
-        }
-
-        pdf.text(produto.codigo, codeX, codeY);
-
-        // Renderizar informação adicional se existir
-        if (produto.informacaoAdicional) {
-            const tamanhoFonteInfo = Math.max(6, tamanhoFonteCodigo - 2); // Fonte um pouco menor
-            pdf.setFontSize(tamanhoFonteInfo);
-            pdf.setFont('helvetica', 'normal'); // Peso normal para tom mais leve
-            pdf.setTextColor(100, 100, 100); // Cor cinza mais clara
-
-            const infoWidth = pdf.getTextWidth(produto.informacaoAdicional);
-            const infoX = x + (width - infoWidth) / 2; // centralizar
-            
-            // Ajustar posição da informação adicional baseado no tipo de código
-            const infoY = y + height - 2; // Manter na borda inferior para ambos os tipos
-
-            pdf.text(produto.informacaoAdicional, infoX, infoY);
-
-            // Restaurar cor do texto para preto
-            pdf.setTextColor(0, 0, 0);
+            curY += h;
         }
     };
 
@@ -395,7 +380,7 @@ const GerarTab = ({ produtos, config, isDarkMode }) => {
                                                 {(produto.tipoCodigo || config.tipoCodigo || 'code128') === 'qrcode' ? (
                                                     // Preview de QR Code
                                                     <div className="mb-2 mx-auto" style={{ width: '30px', height: '30px' }}>
-                                                        <div 
+                                                        <div
                                                             className="w-full h-full bg-gray-800"
                                                             style={{
                                                                 background: `
@@ -448,7 +433,7 @@ const GerarTab = ({ produtos, config, isDarkMode }) => {
                                     {/* Footer com controles */}
                                     <div className="flex items-center gap-3 pt-4 border-t border-gray-200 dark:border-gray-600">
                                         <div className="flex items-center gap-2 flex-1">
-                                            
+
                                             <input
                                                 type="number"
                                                 value={quantities[produto.id] || 18}

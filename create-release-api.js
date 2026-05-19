@@ -1,10 +1,3 @@
-#!/usr/bin/env node
-
-/**
- * Script de Release Automático via API do GitHub
- * Substitui o GitHub Actions workflow
- */
-
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');

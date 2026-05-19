@@ -1,3 +1,5 @@
+import { PAGINA_DIMENSOES } from './etiquetas.constants';
+
 export const ConfiguracaoEtiqueta = ({ handleChange, localConfig, handleSave, resetToDefault }) => {
     return (
         <div className="space-y-6 col-span-12 lg:col-span-4">
@@ -21,9 +23,11 @@ export const ConfiguracaoEtiqueta = ({ handleChange, localConfig, handleSave, re
                                 onChange={(e) => handleChange('tamanhoPagina', e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                             >
-                                <option value="A4">A4 (210 × 297 mm)</option>
-                                <option value="A5">A5 (148 × 210 mm)</option>
-                                <option value="Carta">Carta (216 × 279 mm)</option>
+                                {Object.entries(PAGINA_DIMENSOES).map(([nome, dim]) => (
+                                    <option key={nome} value={nome}>
+                                        {nome} ({dim.largura} × {dim.altura} mm)
+                                    </option>
+                                ))}
                             </select>
                         </div>
 

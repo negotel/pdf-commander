@@ -412,80 +412,130 @@ ipcMain.handle('convert-zpl', async (event, data) => {
         const stream = fs.createWriteStream(outputPath);
         doc.pipe(stream);
 
-        // Processar em lotes de até 50 etiquetas (limite da API)
-        const batchSize = 50;
-        let processedCount = 0;
+        // Processar em lotes usando multipart/mixed — API retorna todas as imagens do lote de uma vez
+        const BATCH_SIZE = 20;
+        const DELAY_ENTRE_LOTES = 500; // ms entre lotes
+        const MAX_RETRIES = 5;
 
-        for (let i = 0; i < etiquetas.length; i += batchSize) {
-            const batch = etiquetas.slice(i, i + batchSize);
-            console.log(`[ZPL] Processando lote ${Math.floor(i / batchSize) + 1}/${Math.ceil(etiquetas.length / batchSize)} (${batch.length} etiquetas)`);
+        const parseMixedMultipart = (buffer, boundary) => {
+            const parts = [];
+            const boundaryBuf = Buffer.from(`--${boundary}`);
+            let pos = 0;
+            while (pos < buffer.length) {
+                const bPos = buffer.indexOf(boundaryBuf, pos);
+                if (bPos === -1) break;
+                const afterB = bPos + boundaryBuf.length;
+                // Fim do multipart
+                if (buffer[afterB] === 0x2D && buffer[afterB + 1] === 0x2D) break;
+                // Pular CRLF após boundary
+                const headerStart = afterB + 2;
+                const headerEnd = buffer.indexOf(Buffer.from('\r\n\r\n'), headerStart);
+                if (headerEnd === -1) break;
+                const dataStart = headerEnd + 4;
+                const nextB = buffer.indexOf(boundaryBuf, dataStart);
+                if (nextB === -1) break;
+                const dataEnd = nextB - 2; // remover CRLF antes do próximo boundary
+                parts.push(buffer.slice(dataStart, dataEnd));
+                pos = nextB;
+            }
+            return parts;
+        };
 
-            // Criar ZPL combinado para o lote
-            const combinedZpl = batch.map(etiqueta => '^XA\n' + etiqueta.trim() + '^XZ').join('\n');
-
-            // Enviar progresso
-            const progressPercent = Math.round(((i + batch.length) / etiquetas.length) * 100);
-            mainWindow.webContents.send('zpl-progress', {
-                current: Math.min(i + batch.length, etiquetas.length),
-                total: etiquetas.length,
-                percent: progressPercent,
-                status: `Processando lote ${Math.floor(i / batchSize) + 1}/${Math.ceil(etiquetas.length / batchSize)} (${batch.length} etiquetas)...`
-            });
-
-            try {
-                // Fazer requisição para a API Labelary com o lote
-                const response = await fetch('http://api.labelary.com/v1/printers/8dpmm/labels/4x6/0/', {
+        const fetchLoteComRetry = async (combinedZpl, loteIdx, totalLotes) => {
+            let tentativa = 0;
+            while (tentativa < MAX_RETRIES) {
+                const response = await fetch('http://api.labelary.com/v1/printers/8dpmm/labels/4x6/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
+                        'Accept': 'multipart/mixed'
                     },
                     body: combinedZpl,
                 });
 
+                if (response.status === 429) {
+                    tentativa++;
+                    const waitMs = Math.pow(2, tentativa) * 2000;
+                    console.log(`[ZPL] Rate limit no lote ${loteIdx + 1}, aguardando ${waitMs / 1000}s...`);
+                    mainWindow.webContents.send('zpl-progress', {
+                        current: loteIdx * BATCH_SIZE,
+                        total: etiquetas.length,
+                        percent: Math.round((loteIdx * BATCH_SIZE / etiquetas.length) * 100),
+                        status: `Rate limit — aguardando ${waitMs / 1000}s (tentativa ${tentativa}/${MAX_RETRIES})...`
+                    });
+                    await new Promise(resolve => setTimeout(resolve, waitMs));
+                    continue;
+                }
+
                 if (!response.ok) {
-                    throw new Error(`Erro na API Labelary (lote ${Math.floor(i / batchSize) + 1}): ${response.status} ${response.statusText}`);
+                    throw new Error(`Erro na API Labelary (lote ${loteIdx + 1}/${totalLotes}): ${response.status} ${response.statusText}`);
                 }
 
-                const buffer = await response.arrayBuffer();
-                const imageBuffer = Buffer.from(buffer);
+                return response;
+            }
+            throw new Error(`Lote ${loteIdx + 1}: limite de retries atingido`);
+        };
 
-                // Quando múltiplas etiquetas são enviadas, a API retorna uma única imagem
-                // com todas as etiquetas empilhadas verticalmente
-                // Cada etiqueta tem altura de 4x6 polegadas = 1218 pontos (aprox.)
-                const labelHeight = 1218; // Altura de cada etiqueta em pontos (6 polegadas * 203 DPI)
-                const labelWidth = 812;   // Largura de cada etiqueta em pontos (4 polegadas * 203 DPI)
+        let processedCount = 0;
+        const totalLotes = Math.ceil(etiquetas.length / BATCH_SIZE);
 
-                // Dividir a imagem em etiquetas individuais usando canvas
-                const { createCanvas, loadImage } = require('canvas');
-                const img = await loadImage(imageBuffer);
+        for (let i = 0; i < etiquetas.length; i += BATCH_SIZE) {
+            const batch = etiquetas.slice(i, i + BATCH_SIZE);
+            const loteIdx = Math.floor(i / BATCH_SIZE);
 
-                for (let j = 0; j < batch.length; j++) {
-                    // Adicionar página ao PDF
+            const combinedZpl = batch.map(e => '^XA\n' + e.trim() + '\n^XZ').join('\n');
+
+            mainWindow.webContents.send('zpl-progress', {
+                current: i,
+                total: etiquetas.length,
+                percent: Math.round((i / etiquetas.length) * 100),
+                status: `Processando lote ${loteIdx + 1}/${totalLotes} (${batch.length} etiquetas)...`
+            });
+
+            try {
+                const response = await fetchLoteComRetry(combinedZpl, loteIdx, totalLotes);
+
+                const contentType = response.headers.get('content-type') || '';
+                const boundaryMatch = contentType.match(/boundary="?([^";]+)"?/);
+
+                const buffer = Buffer.from(await response.arrayBuffer());
+
+                if (boundaryMatch) {
+                    // Resposta multipart — extrair cada imagem individualmente
+                    const boundary = boundaryMatch[1];
+                    const images = parseMixedMultipart(buffer, boundary);
+
+                    for (const imgBuf of images) {
+                        const labelHeight = 1218;
+                        const labelWidth = 812;
+                        doc.addPage({ size: [labelWidth, labelHeight] });
+                        doc.image(imgBuf, 0, 0, { fit: [labelWidth, labelHeight] });
+                        processedCount++;
+                    }
+                    console.log(`[ZPL] Lote ${loteIdx + 1}: ${images.length} etiquetas adicionadas`);
+                } else {
+                    // Resposta simples (só 1 etiqueta no lote)
+                    const labelHeight = 1218;
+                    const labelWidth = 812;
                     doc.addPage({ size: [labelWidth, labelHeight] });
-
-                    // Criar canvas para extrair esta etiqueta específica
-                    const canvas = createCanvas(labelWidth, labelHeight);
-                    const ctx = canvas.getContext('2d');
-
-                    // Extrair a porção da imagem correspondente a esta etiqueta
-                    ctx.drawImage(img, 0, j * labelHeight, labelWidth, labelHeight, 0, 0, labelWidth, labelHeight);
-
-                    // Converter canvas para buffer PNG e adicionar ao PDF
-                    const etiquetaBuffer = canvas.toBuffer('image/png');
-                    doc.image(etiquetaBuffer, 0, 0, { fit: [labelWidth, labelHeight] });
-
+                    doc.image(buffer, 0, 0, { fit: [labelWidth, labelHeight] });
                     processedCount++;
-                    console.log(`[ZPL] Etiqueta ${processedCount}/${etiquetas.length} processada`);
                 }
 
-                // Delay reduzido entre lotes (150ms conforme solicitado)
-                if (i + batchSize < etiquetas.length) {
-                    await new Promise(resolve => setTimeout(resolve, 150));
+                mainWindow.webContents.send('zpl-progress', {
+                    current: processedCount,
+                    total: etiquetas.length,
+                    percent: Math.round((processedCount / etiquetas.length) * 100),
+                    status: `Lote ${loteIdx + 1}/${totalLotes} concluído (${processedCount}/${etiquetas.length} etiquetas)`
+                });
+
+                if (i + BATCH_SIZE < etiquetas.length) {
+                    await new Promise(resolve => setTimeout(resolve, DELAY_ENTRE_LOTES));
                 }
 
             } catch (error) {
-                console.error(`Erro no lote ${Math.floor(i / batchSize) + 1}:`, error);
-                throw new Error(`Erro no lote ${Math.floor(i / batchSize) + 1}: ${error.message}`);
+                console.error(`Erro no lote ${loteIdx + 1}:`, error);
+                throw new Error(`Erro no lote ${loteIdx + 1}: ${error.message}`);
             }
         }
 
@@ -523,6 +573,28 @@ ipcMain.handle('convert-zpl', async (event, data) => {
 });
 
 // Handler para cortar PDF
+ipcMain.handle('get-pdf-info', async (event, data) => {
+    try {
+        const { PDFDocument } = await import('pdf-lib');
+        const uint8Array = Array.isArray(data.fileData) ? new Uint8Array(data.fileData) : data.fileData;
+        const doc = await PDFDocument.load(Buffer.from(uint8Array));
+        const firstPage = doc.getPage(0);
+        const { width, height } = firstPage.getSize();
+
+        return {
+            success: true,
+            pageCount: doc.getPageCount(),
+            firstPage: { width, height },
+        };
+    } catch (error) {
+        console.error('Erro ao ler informações do PDF:', error);
+        return {
+            success: false,
+            error: error.message,
+        };
+    }
+});
+
 ipcMain.handle('cortar-pdf', async (event, data) => {
     console.log('🎯 Handler cortar-pdf chamado!');
     console.log('📄 Dados recebidos:', {
@@ -556,7 +628,15 @@ ipcMain.handle('cortar-pdf', async (event, data) => {
         const outputDir = data.outputDir || path.join(appPath, 'etiquetas');
 
         // Executar o corte
-        await splitLabels(tempPdfPath, outputDir);
+        const baseFileName = path.parse(data.fileName).name;
+        const splitResult = await splitLabels(tempPdfPath, outputDir, data.cutConfig, (progress) => {
+            const percent = 10 + Math.round((progress.current / progress.total) * 65);
+            mainWindow.webContents.send('cortar-pdf-progress', {
+                percent,
+                status: `Cortando página ${progress.page}, etiqueta ${progress.label} (${progress.current}/${progress.total})`,
+                detail: `Arquivo ${progress.outputName}: x=${progress.crop.x}, y=${progress.crop.y}, largura=${progress.crop.width}, altura=${progress.crop.height}`,
+            });
+        }, baseFileName);
 
         // Se deve unir as etiquetas, fazer isso agora
         if (data.unirEtiquetas) {
@@ -569,10 +649,7 @@ ipcMain.handle('cortar-pdf', async (event, data) => {
             });
 
             // Listar arquivos de etiquetas gerados
-            const etiquetaFiles = fs.readdirSync(outputDir)
-                .filter(file => file.startsWith('etiqueta_') && file.endsWith('.pdf'))
-                .map(file => path.join(outputDir, file))
-                .sort(); // Ordenar para manter sequência
+            const etiquetaFiles = splitResult.generatedFiles;
 
             if (etiquetaFiles.length > 0) {
                 // Criar PDF unido
@@ -589,8 +666,7 @@ ipcMain.handle('cortar-pdf', async (event, data) => {
                 }
 
                 // Usar nome do arquivo original como base
-                const baseFileName = path.parse(data.fileName).name;
-                const outputFileName = `${baseFileName}_etiquetas.pdf`;
+                const outputFileName = `${splitResult.outputBaseName}_etiquetas.pdf`;
                 const outputPath = path.join(outputDir, outputFileName);
                 const bytes = await doc.save();
                 fs.writeFileSync(outputPath, bytes);

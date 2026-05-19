@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ConfiguracaoEtiqueta } from './ConfiguracaoEtitqueta';
+import { PAGINA_DIMENSOES } from './etiquetas.constants';
 
 const ConfiguracaoTab = ({ config, onSave, isDarkMode }) => {
     const [localConfig, setLocalConfig] = useState(config);
@@ -16,13 +17,7 @@ const ConfiguracaoTab = ({ config, onSave, isDarkMode }) => {
     }, [localConfig]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const calculateLayout = () => {
-        const paginaDimensoes = {
-            'A4': { largura: 210, altura: 297 },
-            'A5': { largura: 148, altura: 210 },
-            'Carta': { largura: 216, altura: 279 }
-        };
-
-        const pagina = paginaDimensoes[localConfig.tamanhoPagina] || paginaDimensoes['A4'];
+        const pagina = PAGINA_DIMENSOES[localConfig.tamanhoPagina] || PAGINA_DIMENSOES['A4'];
 
         // Área útil (removendo as margens)
         const areaUtil = {
@@ -56,7 +51,8 @@ const ConfiguracaoTab = ({ config, onSave, isDarkMode }) => {
             etiquetasPorLinha,
             linhasPorPagina,
             etiquetasPorPagina,
-            areaUtil
+            areaUtil,
+            pagina
         });
     };
 
@@ -123,7 +119,7 @@ const ConfiguracaoTab = ({ config, onSave, isDarkMode }) => {
                             {/* Preview visual realista */}
                             <div className="mt-6 flex flex-col items-center">
                                 <div className="bg-white border-2 border-gray-300 p-4 rounded-lg overflow-hidden" style={{
-                                    aspectRatio: '210/297',
+                                    aspectRatio: `${previewLayout.pagina.largura}/${previewLayout.pagina.altura}`,
                                     width: '100%',
                                     maxWidth: '600px',
                                     margin: '0 auto'
@@ -133,7 +129,7 @@ const ConfiguracaoTab = ({ config, onSave, isDarkMode }) => {
                                         style={{
                                             gridTemplateColumns: `repeat(${previewLayout.etiquetasPorLinha}, 1fr)`,
                                             gridTemplateRows: `repeat(${previewLayout.linhasPorPagina}, 1fr)`,
-                                            padding: `${(localConfig.margemY / 297) * 100}% ${(localConfig.margemX / 210) * 100}%`
+                                            padding: `${(localConfig.margemY / previewLayout.pagina.altura) * 100}% ${(localConfig.margemX / previewLayout.pagina.largura) * 100}%`
                                         }}
                                     >
                                         {Array(Math.min(previewLayout.etiquetasPorPagina, 20)).fill(0).map((_, i) => (

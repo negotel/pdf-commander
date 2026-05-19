@@ -46,7 +46,7 @@ const ZPLTab = ({ isDarkMode }) => {
         }
     };
 
-    const handleFileSelect = (event) => {
+    const handleFileSelect = async (event) => {
         const files = Array.from(event.target.files);
         const zplFiles = files.filter(file => 
             file.type === 'text/plain' || 
@@ -55,11 +55,16 @@ const ZPLTab = ({ isDarkMode }) => {
         );
 
         if (zplFiles.length > 0) {
-            const newFiles = zplFiles.map(file => ({
-                file,
-                id: Date.now() + Math.random(),
-                status: 'pending',
-                progress: 0
+            const newFiles = await Promise.all(zplFiles.map(async file => {
+                const text = await file.text();
+                const totalEtiquetas = text.split('^XZ').filter(e => e.trim().length > 0).length;
+                return {
+                    file,
+                    id: Date.now() + Math.random(),
+                    status: 'pending',
+                    progress: 0,
+                    totalEtiquetas
+                };
             }));
             setSelectedFiles(prev => [...prev, ...newFiles]);
             setConversionStatus('');
@@ -238,7 +243,7 @@ const ZPLTab = ({ isDarkMode }) => {
         e.stopPropagation();
     };
 
-    const handleDrop = (e) => {
+    const handleDrop = async (e) => {
         e.preventDefault();
         e.stopPropagation();
 
@@ -250,11 +255,16 @@ const ZPLTab = ({ isDarkMode }) => {
         );
 
         if (zplFiles.length > 0) {
-            const newFiles = zplFiles.map(file => ({
-                file,
-                id: Date.now() + Math.random(),
-                status: 'pending',
-                progress: 0
+            const newFiles = await Promise.all(zplFiles.map(async file => {
+                const text = await file.text();
+                const totalEtiquetas = text.split('^XZ').filter(e => e.trim().length > 0).length;
+                return {
+                    file,
+                    id: Date.now() + Math.random(),
+                    status: 'pending',
+                    progress: 0,
+                    totalEtiquetas
+                };
             }));
             setSelectedFiles(prev => [...prev, ...newFiles]);
             setConversionStatus('');
@@ -381,7 +391,9 @@ const ZPLTab = ({ isDarkMode }) => {
                                                 {fileItem.file.name}
                                             </p>
                                             <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                {(fileItem.file.size / 1024).toFixed(1)} KB
+                                                {fileItem.totalEtiquetas != null
+                                                    ? `${fileItem.totalEtiquetas} etiqueta${fileItem.totalEtiquetas !== 1 ? 's' : ''}`
+                                                    : `${(fileItem.file.size / 1024).toFixed(1)} KB`}
                                             </p>
                                             {fileItem.status === 'processing' && (
                                                 <div className="mt-1">

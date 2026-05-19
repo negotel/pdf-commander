@@ -10,7 +10,7 @@
         "postbuild": "node copy-dlls.js",
         "build:pkg": "pkg -t node18-win-x64 --compress Brotli --public -o dist/monta-pdf.exe index.js",
         "config": "node open-config.js",
-        "dev": "electron . --dev"
+        "dev": "cross-env NODE_ENV=development electron . --dev"
     },
     "dependencies": {
         "axios": "^1.12.1",
@@ -25,6 +25,7 @@
         "pdfkit": "^0.17.2"
     },
     "devDependencies": {
+        "cross-env": "^10.1.0",
         "electron": "^33.0.2",
         "electron-builder": "^25.1.8",
         "pkg": "^5.8.1"

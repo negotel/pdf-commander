@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { DEFAULT_CAMPOS_ETIQUETA } from './etiquetas.constants';
 
 const ProdutosTab = ({ produtos, onAdd, onUpdate, onDelete, isDarkMode }) => {
     const [showForm, setShowForm] = useState(false);
@@ -7,8 +8,28 @@ const ProdutosTab = ({ produtos, onAdd, onUpdate, onDelete, isDarkMode }) => {
         descricao: '', 
         codigo: '', 
         tipoCodigo: 'code128',
-        informacaoAdicional: ''
+        informacaoAdicional: '',
+        mostrarBorda: true,
+        camposEtiqueta: DEFAULT_CAMPOS_ETIQUETA.map(c => ({ ...c }))
     });
+
+    const toggleCampo = (index) => {
+        setFormData(prev => {
+            const campos = [...prev.camposEtiqueta];
+            campos[index] = { ...campos[index], visivel: !campos[index].visivel };
+            return { ...prev, camposEtiqueta: campos };
+        });
+    };
+
+    const moveCampo = (index, dir) => {
+        setFormData(prev => {
+            const campos = [...prev.camposEtiqueta];
+            const newIndex = index + dir;
+            if (newIndex < 0 || newIndex >= campos.length) return prev;
+            [campos[index], campos[newIndex]] = [campos[newIndex], campos[index]];
+            return { ...prev, camposEtiqueta: campos };
+        });
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -38,7 +59,9 @@ const ProdutosTab = ({ produtos, onAdd, onUpdate, onDelete, isDarkMode }) => {
             descricao: '', 
             codigo: '', 
             tipoCodigo: 'code128',
-            informacaoAdicional: ''
+            informacaoAdicional: '',
+            mostrarBorda: true,
+            camposEtiqueta: DEFAULT_CAMPOS_ETIQUETA.map(c => ({ ...c }))
         });
         setShowForm(false);
         setEditingProduct(null);
@@ -49,7 +72,9 @@ const ProdutosTab = ({ produtos, onAdd, onUpdate, onDelete, isDarkMode }) => {
             descricao: produto.descricao, 
             codigo: produto.codigo,
             tipoCodigo: produto.tipoCodigo || 'code128',
-            informacaoAdicional: produto.informacaoAdicional || ''
+            informacaoAdicional: produto.informacaoAdicional || '',
+            mostrarBorda: produto.mostrarBorda !== undefined ? produto.mostrarBorda : true,
+            camposEtiqueta: produto.camposEtiqueta || DEFAULT_CAMPOS_ETIQUETA.map(c => ({ ...c }))
         });
         setEditingProduct(produto);
         setShowForm(true);
@@ -149,6 +174,41 @@ const ProdutosTab = ({ produtos, onAdd, onUpdate, onDelete, isDarkMode }) => {
                                     <p className="text-xs text-gray-500 mt-1">
                                         Será exibido abaixo do código na etiqueta com tom mais claro
                                     </p>
+                                </div>
+                            </div>
+
+                            {/* Campos da Etiqueta */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    🏷️ Campos da Etiqueta — ordem e visibilidade
+                                </label>
+                                <div className="space-y-1 p-3 bg-white border border-gray-200 rounded-lg">
+                                    {/* Borda */}
+                                    <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.mostrarBorda}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, mostrarBorda: e.target.checked }))}
+                                            className="w-4 h-4 accent-blue-500"
+                                        />
+                                        <span className="flex-1 text-sm text-gray-700">🟥 Borda na etiqueta</span>
+                                    </div>
+                                    <div className="border-t border-gray-200 my-1" />
+                                    {formData.camposEtiqueta.map((campo, index) => (
+                                        <div key={campo.id} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                                            <input
+                                                type="checkbox"
+                                                checked={campo.visivel}
+                                                onChange={() => toggleCampo(index)}
+                                                className="w-4 h-4 accent-blue-500"
+                                            />
+                                            <span className="flex-1 text-sm text-gray-700">{campo.label}</span>
+                                            <button type="button" onClick={() => moveCampo(index, -1)} disabled={index === 0}
+                                                className="p-1 text-gray-500 hover:text-gray-900 disabled:opacity-30 text-lg leading-none">↑</button>
+                                            <button type="button" onClick={() => moveCampo(index, 1)} disabled={index === formData.camposEtiqueta.length - 1}
+                                                className="p-1 text-gray-500 hover:text-gray-900 disabled:opacity-30 text-lg leading-none">↓</button>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
 
